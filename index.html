@@ -141,6 +141,15 @@
             color: var(--accent-color);
             margin-bottom: 10px;
         }
+        .profile-photo {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            display: block;
+            margin: 0 auto 20px auto;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
         .footer-note {
             font-size: 13px;
             color: #777;
@@ -161,11 +170,6 @@
             <div class="badge">Тест • 10 вопросов • 2 минуты</div>
             <h1>Вы уже пережили кризис или всё ещё живете внутри него?</h1>
             <p>Если после тяжелого события прошло уже несколько месяцев или даже лет, но внутри почти ничего не изменилось, ответьте на 10 вопросов и узнайте, насколько пережитый опыт до сих пор влияет на вашу жизнь.</p>
-            <p><strong>Как отвечать:</strong> возле каждого утверждения выберите один вариант ответа:<br>
-            • 0 баллов — совсем не про меня<br>
-            • 1 балл — бывает редко<br>
-            • 2 балла — бывает часто<br>
-            • 3 балла — почти постоянно</p>
             <button class="btn" onclick="nextScreen()">Начать тест</button>
             <div class="footer-note">Анастасия Хомякова • Кризисный психолог</div>
         </div>
@@ -173,7 +177,20 @@
         <!-- Контейнер для вопросов (генерируются динамически) -->
         <div id="questions-container"></div>
 
-        <!-- Экран результатов -->
+        <!-- Экран 11: Промежуточная страница с фото и описанием -->
+        <div class="screen" id="screen-bridge">
+            <img src="photo.jpg" alt="Анастасия Хомякова" class="profile-photo">
+            <p>Перед тем, как вы увидите результат, хочу предупредить вас. Даже если вы набрали много баллов, с вами всё в порядке, это говорит лишь о том, что пережитое событие до сих пор влияет на вашу жизнь, психике можно и нужно помочь.</p>
+            <p>Меня зовут <strong>Анастасия Хомякова</strong>, я дипломированный кризисный психолог и работаю с женщинами, чья жизнь однажды разделилась на «до» и «после».</p>
+            <p>Ко мне обращаются после утрат, измен, разводов, перинатальных потерь и других тяжелых событий, которые объединяет общее состояние — беспомощности и неопределенности.</p>
+            <p>Помогаю эффективно переработать болезненный опыт, вернуть ощущение безопасности и жизни, которой больше не управляет прошлое.</p>
+            <p>Вы можете написать мне, какое событие разделило вашу жизнь на «до» и «после». И я постараюсь дать небольшой комментарий с учетом именно вашей ситуации.</p>
+            
+            <a href="https://ig.me/m/khomyakova_psy" class="btn" target="_blank" style="background-color: #78525f;">Задать вопрос</a>
+            <button class="btn" style="background-color: var(--accent-color); margin-top: 10px;" onclick="showScreen(12)">Получить результат и рекомендации</button>
+        </div>
+
+        <!-- Экран 12: Результаты -->
         <div class="screen" id="screen-result">
             <div class="badge">Результат теста</div>
             <h2>Ваш результат</h2>
@@ -181,10 +198,7 @@
                 <div class="result-score" id="resultScoreText"></div>
                 <div id="resultDescription" style="font-size: 15px; line-height: 1.6; color: #444;"></div>
             </div>
-            <p style="text-align: center; color: #555; margin-top: 10px; font-size: 14px;">
-                Если вы чувствуете, что вам нужна поддержка и бережное пространство для работы с пережитым опытом, вы всегда можете написать мне:
-            </p>
-            <a href="https://t.me/khomyakova_psy" class="btn" target="_blank">Написать в Telegram</a>
+            <a href="https://ig.me/m/khomyakova_psy" class="btn" target="_blank">Написать в Instagram</a>
             <button class="btn" style="background-color: #6c757d; margin-top: 10px;" onclick="resetTest()">Пройти тест заново</button>
         </div>
     </div>
@@ -204,10 +218,10 @@
         ];
 
         const options = [
-            { score: 0, text: "0 баллов — совсем не про меня" },
-            { score: 1, text: "1 балл — бывает редко" },
-            { score: 2, text: "2 балла — бывает часто" },
-            { score: 3, text: "3 балла — почти постоянно" }
+            { score: 0, text: "Совсем не про меня" },
+            { score: 1, text: "Такое бывает редко" },
+            { score: 2, text: "Такое часто происходит" },
+            { score: 3, text: "Почти постоянно" }
         ];
 
         const resultsData = [
@@ -277,7 +291,7 @@
         }
 
         function updateProgress() {
-            let percentage = (currentStep / 10) * 100;
+            let percentage = (currentStep / 11) * 100;
             if (percentage > 100) percentage = 100;
             document.getElementById('progressBar').style.width = percentage + '%';
         }
@@ -290,6 +304,8 @@
             } else if (step >= 1 && step <= 10) {
                 document.getElementById(`screen-q-${step}`).classList.add('active');
             } else if (step === 11) {
+                document.getElementById('screen-bridge').classList.add('active');
+            } else if (step === 12) {
                 document.getElementById('screen-result').classList.add('active');
                 calculateResult();
             }
@@ -304,7 +320,7 @@
             } else if (currentStep >= 1 && currentStep <= 10) {
                 if (scores[currentStep - 1] === null) return;
                 if (currentStep === 10) {
-                    showScreen(11);
+                    showScreen(11); // Переход на промежуточную страницу с фото
                 } else {
                     showScreen(currentStep + 1);
                 }
