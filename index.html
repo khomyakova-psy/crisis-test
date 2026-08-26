@@ -68,7 +68,7 @@
         }
         h1 { font-size: 24px; margin-bottom: 16px; }
         h2 { font-size: 20px; margin-bottom: 12px; }
-        h3 { font-size: 17px; margin-bottom: 14px; color: var(--accent-color); }
+        h3 { font-size: 18px; margin-bottom: 14px; color: var(--accent-color); }
         p {
             font-size: 15px;
             line-height: 1.6;
@@ -178,13 +178,13 @@
             margin-top: 6px;
         }
         .profile-photo {
-            width: 120px;
-            height: 120px;
+            width: 160px;
+            height: 160px;
             border-radius: 50%;
             object-fit: cover;
             display: block;
             margin: 0 auto 20px auto;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.12);
         }
         .footer-note {
             font-size: 13px;
@@ -213,11 +213,15 @@
         <!-- Контейнер для вопросов (генерируются динамически) -->
         <div id="questions-container"></div>
 
-        <!-- Экран 11: Промежуточная страница -->
-        <div class="screen" id="screen-bridge">
+        <!-- Экран 11: Первая промежуточная страница (Важное напоминание) -->
+        <div class="screen" id="screen-bridge-1">
             <h3>Важное напоминание перед тем, как открыть расшифровку:</h3>
             <p>Если вы набрали много баллов, с вами всё в порядке, это говорит лишь о том, что пережитое событие до сих пор влияет на вашу жизнь, психике можно и нужно помочь.</p>
-            
+            <button class="btn" onclick="showScreen(12)">Далее</button>
+        </div>
+
+        <!-- Экран 12: Вторая промежуточная страница (О себе и контакты) -->
+        <div class="screen" id="screen-bridge-2">
             <img src="photo.jpg" alt="Анастасия Хомякова" class="profile-photo">
             
             <p>Меня зовут <strong>Анастасия Хомякова</strong>, я <strong>кризисный психолог</strong> для женщин.</p>
@@ -229,13 +233,15 @@
             
             <p>Опираюсь на методы с <strong>доказанной эффективностью</strong>, EMDR и КПТ.</p>
             
-            <p>Вы можете написать мне, какое событие разделило вашу жизнь на «до» и «после». И я постараюсь дать небольшой комментарий с учетом именно вашей ситуации.</p>
+            <a href="http://khomyakova-psy.tilda.ws" class="btn" target="_blank" style="background-color: #8e6573;">Подробнее обо мне на сайте</a>
+            
+            <p style="margin-top: 25px;">Вы можете написать мне, какое событие разделило вашу жизнь на «до» и «после», я пришлю небольшой разбор именно вашей ситуации и мы наметим первые шаги для восстановления.</p>
             
             <a href="https://ig.me/m/khomyakova_psy" class="btn" target="_blank" style="background-color: #78525f;">Написать сообщение</a>
-            <button class="btn" style="background-color: var(--accent-color);" onclick="showScreen(12)">Получить расшифровку теста</button>
+            <button class="btn" style="background-color: var(--accent-color); margin-top: 10px;" onclick="showScreen(13)">Получить расшифровку теста</button>
         </div>
 
-        <!-- Экран 12: Результаты -->
+        <!-- Экран 13: Результаты -->
         <div class="screen" id="screen-result">
             <div class="badge">Результат теста</div>
             <h2>Ваш результат</h2>
@@ -256,8 +262,7 @@
 
                 <div id="resultDescription" style="font-size: 15px; line-height: 1.6; color: #444;"></div>
             </div>
-            <a href="http://khomyakova-psy.tilda.ws" class="btn" target="_blank">Подробнее на сайте</a>
-            <a href="https://ig.me/m/khomyakova_psy" class="btn" target="_blank" style="background-color: #78525f; margin-top: 10px;">Записаться на консультацию</a>
+            <a href="https://ig.me/m/khomyakova_psy" class="btn" target="_blank" style="background-color: #8e6573;">Записаться на консультацию</a>
             <button class="btn" style="background-color: #6c757d; margin-top: 10px;" onclick="resetTest()">Пройти тест заново</button>
         </div>
     </div>
@@ -345,7 +350,7 @@
         }
 
         function updateProgress() {
-            let percentage = (currentStep / 11) * 100;
+            let percentage = (currentStep / 12) * 100;
             if (percentage > 100) percentage = 100;
             document.getElementById('progressBar').style.width = percentage + '%';
         }
@@ -358,8 +363,10 @@
             } else if (step >= 1 && step <= 10) {
                 document.getElementById(`screen-q-${step}`).classList.add('active');
             } else if (step === 11) {
-                document.getElementById('screen-bridge').classList.add('active');
+                document.getElementById('screen-bridge-1').classList.add('active');
             } else if (step === 12) {
+                document.getElementById('screen-bridge-2').classList.add('active');
+            } else if (step === 13) {
                 document.getElementById('screen-result').classList.add('active');
                 calculateResult();
             }
@@ -374,7 +381,7 @@
             } else if (currentStep >= 1 && currentStep <= 10) {
                 if (scores[currentStep - 1] === null) return;
                 if (currentStep === 10) {
-                    showScreen(11);
+                    showScreen(11); // Переход на экран с важным напоминанием
                 } else {
                     showScreen(currentStep + 1);
                 }
@@ -409,7 +416,6 @@
             const totalScore = scores.reduce((a, b) => a + b, 0);
             document.getElementById('resultScoreText').innerText = `Сумма баллов: ${totalScore} из 30`;
             
-            // Позиция ползунка на шкале (в процентах от 0 до 100)
             const percentage = (totalScore / 30) * 100;
             document.getElementById('scaleThumb').style.left = percentage + '%';
 
