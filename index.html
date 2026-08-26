@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вы уже пережили кризис или всё ещё живете внутри него? — Анастасия Хомякова</title>
+    <style>
+        :root {
+            --bg-color: #f7f4ef;
+            --card-bg: #ffffff;
+            --text-color: #2d2b2a;
+            --accent-color: #8e6573;
+            --accent-hover: #78525f;
+            --border-color: #e3decb;
+            --light-accent: #f2edf3;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            padding: 30px;
+            margin: 20px;
+            box-sizing: border-box;
+        }
+        .progress-container {
+            width: 100%;
+            background-color: #e5e0d8;
+            border-radius: 4px;
+            height: 6px;
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            background-color: var(--accent-color);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        .badge {
+            display: inline-block;
+            background-color: var(--light-accent);
+            color: var(--accent-color);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 16px;
+        }
+        h1, h2 {
+            font-family: Georgia, serif;
+            font-weight: 600;
+            color: #232120;
+            line-height: 1.3;
+            margin-top: 0;
+        }
+        h1 { font-size: 24px; margin-bottom: 16px; }
+        h2 { font-size: 20px; margin-bottom: 12px; }
+        p {
+            font-size: 15px;
+            line-height: 1.6;
+            color: #555;
+            margin-bottom: 20px;
+        }
+        .btn {
+            display: block;
+            width: 100%;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+            text-align: center;
+            box-sizing: border-box;
+            text-decoration: none;
+            margin-top: 20px;
+        }
+        .btn:hover {
+            background-color: var(--accent-hover);
+        }
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .option-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #fff;
+        }
+        .option-item:hover {
+            border-color: var(--accent-color);
+            background-color: var(--light-accent);
+        }
+        .option-item input {
+            margin-right: 12px;
+            accent-color: var(--accent-color);
+            transform: scale(1.2);
+        }
+        .option-text {
+            font-size: 15px;
+            color: #333;
+        }
+        .screen {
+            display: none;
+        }
+        .screen.active {
+            display: block;
+        }
+        .result-box {
+            background: var(--light-accent);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        .result-score {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--accent-color);
+            margin-bottom: 10px;
+        }
+        .footer-note {
+            font-size: 13px;
+            color: #777;
+            text-align: center;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Полоса прогресса -->
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+
+        <!-- Экран 0: Приветствие -->
+        <div class="screen active" id="screen-intro">
+            <div class="badge">Тест • 10 вопросов • 2 минуты</div>
+            <h1>Вы уже пережили кризис или всё ещё живете внутри него?</h1>
+            <p>Если после тяжелого события прошло уже несколько месяцев или даже лет, но внутри почти ничего не изменилось, ответьте на 10 вопросов и узнайте, насколько пережитый опыт до сих пор влияет на вашу жизнь.</p>
+            <p><strong>Как отвечать:</strong> возле каждого утверждения выберите один вариант ответа:<br>
+            • 0 баллов — совсем не про меня<br>
+            • 1 балл — бывает редко<br>
+            • 2 балла — бывает часто<br>
+            • 3 балла — почти постоянно</p>
+            <button class="btn" onclick="nextScreen()">Начать тест</button>
+            <div class="footer-note">Анастасия Хомякова • Кризисный психолог</div>
+        </div>
+
+        <!-- Контейнер для вопросов (генерируются динамически) -->
+        <div id="questions-container"></div>
+
+        <!-- Экран результатов -->
+        <div class="screen" id="screen-result">
+            <div class="badge">Результат теста</div>
+            <h2>Ваш результат</h2>
+            <div class="result-box">
+                <div class="result-score" id="resultScoreText"></div>
+                <div id="resultDescription" style="font-size: 15px; line-height: 1.6; color: #444;"></div>
+            </div>
+            <p style="text-align: center; color: #555; margin-top: 10px; font-size: 14px;">
+                Если вы чувствуете, что вам нужна поддержка и бережное пространство для работы с пережитым опытом, вы всегда можете написать мне:
+            </p>
+            <a href="https://t.me/khomyakova_psy" class="btn" target="_blank">Написать в Telegram</a>
+            <button class="btn" style="background-color: #6c757d; margin-top: 10px;" onclick="resetTest()">Пройти тест заново</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            "Я снова и снова мысленно возвращаюсь к событию, которое изменило мою жизнь, хотя очень хочу перестать об этом думать.",
+            "Даже спустя время случайный запах, песня, место, фотография или чья-то фраза могут вызвать у меня сильные эмоции или воспоминания.",
+            "Я часто прокручиваю в голове разные варианты того, что могла сказать или сделать иначе.",
+            "Я постоянно жду, что снова случится что-то плохое, даже если объективных причин для этого нет.",
+            "Мне трудно расслабиться, потому что внутри словно постоянно работает сигнал тревоги.",
+            "Я делаю вид, что со мной всё в порядке, хотя внутри чувствую совсем другое.",
+            "Мне кажется, что окружающие давно живут дальше, а я будто застряла в том событии.",
+            "Я уже пробовала отвлекаться, читать книги, слушать советы или разговаривать с близкими, но по-настоящему легче не стало.",
+            "Я замечаю, что стала меньше доверять людям, жизни или самой себе после произошедшего.",
+            "Мне всё чаще кажется, что я устала держаться и быть сильной."
+        ];
+
+        const options = [
+            { score: 0, text: "0 баллов — совсем не про меня" },
+            { score: 1, text: "1 балл — бывает редко" },
+            { score: 2, text: "2 балла — бывает часто" },
+            { score: 3, text: "3 балла — почти постоянно" }
+        ];
+
+        const resultsData = [
+            {
+                min: 0, max: 6,
+                title: "0–6 баллов",
+                text: "Похоже, сейчас пережитое событие уже не определяет вашу повседневную жизнь. Это не означает, что вы полностью забыли произошедшее или больше никогда не испытываете грусть, тревогу или боль. Скорее всего, эти чувства возникают время от времени, но уже не управляют вашими решениями, отношениями и ощущением себя.<br><br>После тяжелых событий психике требуется время, чтобы встроить произошедшее в жизненный опыт. Судя по вашему результату, этот процесс практически завершился. Воспоминания остались, но мозг больше не воспринимает их как сигнал опасности.<br><br><strong>На что стоит обратить внимание:</strong><br>Если вы все же замечаете, что определенные ситуации продолжают вызывать сильную реакцию, не игнорируйте это. Иногда остаются отдельные болезненные точки, с которыми тоже можно работать.<br><br>Продолжайте поддерживать себя, замечать свои потребности и не требовать от себя полного отсутствия боли. Иногда грусть – не признак проблемы, а естественная часть нашей истории.<br><br><strong>Как вы можете помочь себе уже сейчас:</strong><br>Скорее всего, у вашей психики уже достаточно внутренних ресурсов, чтобы справляться с последствиями пережитого. Сейчас важно не стремиться полностью забыть произошедшее, а бережно относиться к себе.<br>Полезно:<br>- поддерживать привычный режим сна, отдыха и физической активности;<br>- регулярно задавать себе вопрос: «Что сейчас важно именно мне?»;<br>- разрешать себе грустить, если воспоминания иногда возвращаются, не пытаясь сразу их прогнать;<br>- уделять время тому, что приносит ощущение жизни: общению, творчеству, прогулкам, любимым занятиям."
+            },
+            {
+                min: 7, max: 12,
+                title: "7–12 баллов",
+                text: "Скорее всего, вы уже начали восстанавливаться, но некоторые последствия кризиса продолжают напоминать о себе. Иногда вам удается чувствовать себя спокойно, а иногда прошлое неожиданно возвращается в мыслях, эмоциях или телесных реакциях.<br><br>Мозг постепенно перестраивается после пережитого опыта, но некоторые ситуации по-прежнему воспринимаются им как потенциальная опасность. Поэтому определенные триггеры могут запускать старые реакции.<br><br><strong>На что стоит обратить внимание:</strong><br>Если вы все чаще избегаете определенных мест, разговоров или ситуаций, если тревога начинает ограничивать вашу жизнь или вы постоянно откладываете важные решения из-за страха повторения прошлого, стоит присмотреться к этому внимательнее.<br><br>Поддержка близких, бережное отношение к себе и работа с психологом помогают завершить процессы восстановления быстрее и спокойнее, чем попытки просто ждать, пока «само пройдет».<br><br><strong>Как вы можете помочь себе уже сейчас:</strong><br>Вашей психике важно постепенно возвращать ощущение безопасности.<br>Попробуйте:<br>- замечать ситуации, после которых тревога усиливается, не обвиняя себя за эти реакции;<br>- возвращать внимание в настоящий момент через ощущения тела: почувствовать опору под ногами, обратить внимание на дыхание, окружающие звуки, запахи;<br>- не изолироваться, а сохранять контакт с людьми, рядом с которыми можно быть собой;<br>- не торопить себя словами «пора уже отпустить».<br><br>Если через несколько месяцев вы не замечаете изменений или становится только тяжелее, имеет смысл обсудить это со специалистом."
+            },
+            {
+                min: 13, max: 18,
+                title: "13–18 баллов",
+                text: "Похоже, пережитое событие до сих пор заметно влияет на вашу жизнь. Возможно, внешне многое уже наладилось, но внутри вы все еще часто возвращаетесь к тому, что произошло. Вы можете замечать постоянную тревогу, чувство вины, внутреннее напряжение или ощущение, что жизнь разделилась на «до» и «после».<br><br>Когда событие оказалось слишком тяжелым для психики, мозг продолжает воспринимать его как незавершенное. Именно поэтому воспоминания возвращаются снова и снова, а организм продолжает жить так, словно опасность еще не закончилась.<br><br><strong>На что стоит обратить внимание:</strong><br>Если вам кажется, что время идет, а легче не становится, это не означает, что вы делаете что-то неправильно. Иногда психике недостаточно времени, ей нужна возможность безопасно переработать пережитый опыт.<br><br>Работа с кризисным психологом помогает не забыть прошлое, а снизить его влияние на настоящее. Цель такой работы – вернуть ощущение безопасности, внутренней опоры и возможность снова жить сегодняшним днем.<br><br><strong>Как вы можете помочь себе уже сейчас:</strong><br>На этом этапе важно перестать бороться со своими переживаниями. Вместо попыток «взять себя в руки» попробуйте:<br>- относиться к своим реакциям как к сигналам психики, а не как к собственной слабости;<br>- замечать не только свои обязанности, но и собственные потребности;<br>- выделить человека, рядом с которым можно честно сказать: «Мне до сих пор тяжело»;<br>- обратить внимание, становится ли ваше состояние хоть немного легче со временем или вы будто ходите по кругу.<br><br>Если вы понимаете, что жизнь все еще вращается вокруг произошедшего события, не откладывайте обращение за помощью."
+            },
+            {
+                min: 19, max: 24,
+                title: "19–24 балла",
+                text: "Ваш результат говорит о том, что последствия кризиса продолжают занимать значительное место в вашей жизни. Возможно, вы часто возвращаетесь к произошедшему, постоянно ожидаете новой беды, с трудом расслабляетесь или чувствуете, что больше не узнаете себя.<br><br>Это не означает, что вы недостаточно старались справиться. Когда человек сталкивается с событием, которое резко разрушает ощущение безопасности, нервная система может долго оставаться в режиме повышенной готовности. Именно поэтому даже спустя месяцы или годы тело и психика продолжают реагировать так, словно опасность все еще рядом.<br><br><strong>На что стоит обратить внимание:</strong><br>Если вы замечаете, что тревога, чувство вины, эмоциональное истощение или постоянное напряжение начинают влиять на отношения, работу, сон или качество жизни, важно не оставаться с этим в одиночку.<br><br>В таких ситуациях поддержка специалиста — это не признак слабости, а возможность помочь психике завершить процесс восстановления, постепенно вернуть чувство безопасности и снизить влияние прошлого на настоящее.<br><br><strong>Как вы можете помочь себе уже сейчас:</strong><br>Если вы набрали столько баллов, ваша главная задача – перестать требовать от себя справиться любой ценой.<br>Сейчас может быть полезно:<br>- снизить нагрузку там, где это возможно, даже если кажется, что «надо потерпеть»;<br>- не принимать важных решений в моменты сильной тревоги или эмоционального истощения;<br>- замечать не только свои обязанности, но и собственные потребности;<br>- отказаться от идеи, что время само обязательно всё исправит.<br><br>На этом этапе самопомощь может немного облегчить состояние, но часто оказывается недостаточной, потому что проблема уже не в силе характера, а в том, что нервная система продолжает жить так, словно опасность еще не закончилась."
+            },
+            {
+                min: 25, max: 30,
+                title: "25–30 баллов",
+                text: "Похоже, пережитый кризис до сих пор остается частью вашей повседневной жизни. Возможно, вы живете с постоянным внутренним напряжением, часто возвращаетесь к произошедшему, ощущаете бессилие, одиночество или чувство, что прежняя жизнь закончилась.<br><br>Такой результат не говорит о том, что вы «сломались» и никогда не восстановитесь. Скорее всего, пережитое событие оказалось настолько значимым, что психика все еще продолжает пытаться защитить вас от повторения этой боли. Именно поэтому прошлое так настойчиво вмешивается в настоящее.<br><br><strong>На что стоит обратить внимание:</strong><br>Если вы узнали себя в большинстве утверждений теста, не стоит оставаться с этим состоянием один на один. Чем дольше нервная система живет в режиме постоянной тревоги, тем сильнее это влияет на эмоциональное состояние, отношения, здоровье и ощущение качества жизни.<br><br>Восстановление после кризиса возможно, и оно не начинается с требования «взять себя в руки». Оно начинается с безопасного пространства, где больше не нужно делать вид, что все хорошо, где вашу боль не обесценивают и не торопят. Именно в таких условиях психика постепенно перестает жить прошлым и снова начинает чувствовать опору в настоящем.<br><br><strong>Как вы можете помочь себе уже сейчас:</strong><br>Если вы получили такой результат, пожалуйста, не воспринимайте его как приговор.<br>Это не значит, что с вами что-то не так, но это может означать, что вы слишком долго живете в состоянии внутреннего напряжения и пытаетесь справляться с тем, что оказалось больше ваших внутренних ресурсов.<br>Прямо сейчас вы можете сделать для себя несколько важных вещей:<br>- перестать убеждать себя, что «нужно просто потерпеть»;<br>- отказаться от постоянного сравнения себя с теми, кто, как кажется, уже давно «живет дальше»;<br>- разрешить себе признать, что вам тяжело;<br>- поделиться своим состоянием с человеком, которому вы доверяете.<br><br>И, если почувствуете готовность, не откладывайте обращение за профессиональную помощь. Некоторые жизненные события действительно не предназначены для того, чтобы проживать их в одиночку."
+            }
+        ];
+
+        let currentStep = 0;
+        let scores = new Array(questions.length).fill(null);
+
+        function buildQuestionsDOM() {
+            const container = document.getElementById('questions-container');
+            questions.forEach((q, index) => {
+                let screenDiv = document.createElement('div');
+                screenDiv.className = 'screen';
+                screenDiv.id = `screen-q-${index + 1}`;
+                
+                let html = `
+                    <div class="badge">Вопрос ${index + 1} из 10</div>
+                    <h2>${q}</h2>
+                    <div class="options-list">
+                `;
+                
+                options.forEach(opt => {
+                    html += `
+                        <label class="option-item" onclick="selectOption(${index}, ${opt.score})">
+                            <input type="radio" name="q${index}" value="${opt.score}" ${scores[index] === opt.score ? 'checked' : ''}>
+                            <span class="option-text">${opt.text}</span>
+                        </label>
+                    `;
+                });
+
+                html += `
+                    </div>
+                    <div style="display: flex; gap: 10px; margin-top: 20px;">
+                        ${index > 0 ? `<button class="btn" style="background-color: #a89f91;" onclick="prevScreen()">Назад</button>` : ''}
+                        <button class="btn" id="next-btn-${index}" onclick="nextScreen()" ${scores[index] === null ? 'disabled style="opacity: 0.6; cursor: not-allowed;"' : ''}>Далее</button>
+                    </div>
+                `;
+
+                screenDiv.innerHTML = html;
+                container.appendChild(screenDiv);
+            });
+        }
+
+        function updateProgress() {
+            let percentage = (currentStep / 10) * 100;
+            if (percentage > 100) percentage = 100;
+            document.getElementById('progressBar').style.width = percentage + '%';
+        }
+
+        function showScreen(step) {
+            document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
+            
+            if (step === 0) {
+                document.getElementById('screen-intro').classList.add('active');
+            } else if (step >= 1 && step <= 10) {
+                document.getElementById(`screen-q-${step}`).classList.add('active');
+            } else if (step === 11) {
+                document.getElementById('screen-result').classList.add('active');
+                calculateResult();
+            }
+            currentStep = step;
+            updateProgress();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function nextScreen() {
+            if (currentStep === 0) {
+                showScreen(1);
+            } else if (currentStep >= 1 && currentStep <= 10) {
+                if (scores[currentStep - 1] === null) return;
+                if (currentStep === 10) {
+                    showScreen(11);
+                } else {
+                    showScreen(currentStep + 1);
+                }
+            }
+        }
+
+        function prevScreen() {
+            if (currentStep > 1 && currentStep <= 10) {
+                showScreen(currentStep - 1);
+            } else if (currentStep === 1) {
+                showScreen(0);
+            }
+        }
+
+        function selectOption(qIndex, scoreValue) {
+            scores[qIndex] = scoreValue;
+            const radios = document.querySelectorAll(`input[name="q${qIndex}"]`);
+            radios.forEach(r => {
+                if (parseInt(r.value) === scoreValue) {
+                    r.checked = true;
+                }
+            });
+            const nextBtn = document.getElementById(`next-btn-${qIndex}`);
+            if (nextBtn) {
+                nextBtn.disabled = false;
+                nextBtn.style.opacity = '1';
+                nextBtn.style.cursor = 'pointer';
+            }
+        }
+
+        function calculateResult() {
+            const totalScore = scores.reduce((a, b) => a + b, 0);
+            document.getElementById('resultScoreText').innerText = `Сумма баллов: ${totalScore} из 30`;
+            
+            let matchedResult = resultsData.find(r => totalScore >= r.min && totalScore <= r.max);
+            if (matchedResult) {
+                document.getElementById('resultDescription').innerHTML = `<strong>${matchedResult.title}</strong><br><br>${matchedResult.text}`;
+            }
+        }
+
+        function resetTest() {
+            scores = new Array(questions.length).fill(null);
+            document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
+            for (let i = 0; i < 10; i++) {
+                const btn = document.getElementById(`next-btn-${i}`);
+                if (btn) {
+                    btn.disabled = true;
+                    btn.style.opacity = '0.6';
+                    btn.style.cursor = 'not-allowed';
+                }
+            }
+            showScreen(0);
+        }
+
+        window.onload = function() {
+            buildQuestionsDOM();
+        };
+    </script>
+</body>
+</html>
